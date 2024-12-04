@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<title>Giỏ hàng</title>
+<link rel="stylesheet" href="{% static 'css/cart.css' %}">
+<div style="font-family: Arial; ; margin: 50px 100px; ">
+    <div style="margin-bottom: 10px;">
+        <span style="font-size: 20px;"><a href="" class="breadcrumb" style="background-color: white; display: inline; margin-right: 0; padding: 5px;">Trang chủ</a>&gt; <strong>Giỏ hàng</strong></span>
+    </div>
+<div class="cart-page">
+    
+
+    {% if cart_items %}
+    <div class="cart-container">
+        <div class="cart-items">
+            {% for item in cart_items %}
+            <div class="cart-item">
+                <div class="product-images">
+                    {% with item.Product.productimage_set.all|filter_by_primary:True as primary_image %}
+                    <img src="{{ primary_image.Image_Url }}" alt="{{ item.Product.Product_Name }}">
+                    {% endwith %}
+                </div>
+
+                <div class="item-details">
+                    <h3 class="product-name">{{ item.Product.Product_Name }}</h3>
+                    <p class="product-price">Giá: {{ item.Product.Unit_Price|intcomma }}₫</p>
+                    <div class="quantity-control">
+                        <form method="post" action="{% url 'update_cart_item' item.id %}">
+                            {% csrf_token %}
+                            <button class="btn-quantity" type="submit" name="quantity" value="-1">-</button>
+                            <span>{{ item.Quantity }}</span>
+                            <button class="btn-quantity" type="submit" name="quantity" value="1">+</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="product-subtotal">
+                    <p>Thành tiền: {{ item.Subtotal|intcomma }}₫</p>
+                </div>
+
+                <div class="item-actions">
+                    <form action="{% url 'remove_from_cart' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button class="btn-remove">Xóa</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+            <div class="summary-item">
+                <span>Tổng tiền:</span>
+                <span class="summary-price">{{ total_price|intcomma }}₫</span>
+            </div>
+            <div class="summary-actions">
+                <form action="{% url 'product_list' %}" method="get">
+                    <button class="btn-action btn-continue">Tiếp tục mua hàng</button>
+                </form>
+                <form action="{% url 'checkout' %}" method="get">
+                    <button class="btn-action btn-checkout">Thanh toán</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="empty-cart">
+        <p>Giỏ hàng của bạn đang trống.</p>
+        <form action="{% url 'product_list' %}" method="get">
+            <button class="btn-action btn-continue">Tiếp tục mua hàng</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

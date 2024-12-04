@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Tìm kiếm{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+<div class="search-results-container">
+    <main class="product-list">
+        <h2>Kết quả tìm kiếm</h2>
+        {% if products %}
+            <p class="message">Tìm thấy {{ products.count }} sản phẩm phù hợp với từ khóa "{{ search }}"</p>
+        {% else %}
+            <p class="message">Không có sản phẩm nào được tìm thấy với từ khóa "{{ search }}"</p>
+        {% endif %}
+
+        <div class="search-product-grid">
+            {% for product in products %}
+            <div class="product-item">
+                    <a href="{% url 'product_detail' product_id=product.id %}">
+                        <img src="{{ product.primary_image.Image_Url }}" alt="{{ product.Product_Name }}">
+                    </a>
+                    <h3>
+                        <a href="{% url 'product_detail' product_id=product.id %}">{{ product.Product_Name }}</a>
+                    </h3>
+                    <p class="price">{{ product.Unit_Price|intcomma }}đ</p>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+{% endblock %}

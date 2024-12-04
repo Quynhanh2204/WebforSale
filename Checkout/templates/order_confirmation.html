@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="order-confirmation">
+    <h1>Đặt hàng thành công!</h1>
+    <p>Cảm ơn bạn đã mua sắm tại cửa hàng của chúng tôi.</p>
+    <p><strong>Mã đơn hàng:</strong> {{ order.Order_ID }}</p>
+    <p><strong>Tổng cộng:</strong> {{ order.Total_Price|floatformat:0 }} đ</p>
+    <p><strong>Phương thức thanh toán:</strong> {{ order.Payment_Method.Method_Name }}</p>
+    <p><strong>Phương thức vận chuyển:</strong> {{ order.Shipment_Method.Method_Name }}</p>
+    <p>Chúng tôi sẽ liên hệ để xác nhận và giao hàng trong thời gian sớm nhất.</p>
+</div>
+
+
+    <div class="back-buttons">
+        <a href="{% url 'base' %}" class="button">Về trang chủ</a>
+        <a href="{% url 'product_list' %}" class="button">Tiếp tục mua sắm</a>
+    </div>
+</div>
+
+<style>
+    .order-confirmation {
+        text-align: center;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        margin: 50px auto;
+        width: 70%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .order-confirmation h1 {
+        color: #4CAF50;
+        margin-bottom: 20px;
+    }
+    .order-details, .order-products {
+        text-align: left;
+        margin-top: 20px;
+    }
+    .order-details ul {
+        list-style: none;
+        padding: 0;
+    }
+    .order-details ul li {
+        margin-bottom: 10px;
+    }
+    .back-buttons {
+        margin-top: 20px;
+    }
+    .back-buttons .button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 0 10px;
+    }
+    .back-buttons .button:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}

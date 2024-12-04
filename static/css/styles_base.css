@@ -1,0 +1,182 @@
+/* Header */
+nav {
+    display: flex; /* Thiết lập flexbox */
+    justify-content: space-between; /* Căn chỉnh các phần tử */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    padding: 20px; /* Khoảng cách bên trong container */
+}
+
+.navbar {
+    min-height: 100px;
+    font-size: 20px;
+}
+
+.navbar-nav {
+    width: 800px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.nav-item {
+    font-family: Arial, ui-monospace;
+    font-weight: 600;
+    width: 140px;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-item:last-child {
+    margin-right: 0; /* Để không có khoảng cách ở item cuối cùng */
+}
+
+.nav-link {
+    color: #32827B;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s, border-radius 0.3s;
+}
+
+.nav-link:hover {
+    color: #F5D26E;
+    background-color: #32827B;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.dropdown {
+    position: relative; /* Quan trọng: giúp dropdown item nằm đúng vị trí */
+}
+
+.dropdown-menu {
+    display: none;
+    min-width: 140px;
+    position: absolute;
+    background-color: #F5D26E;
+    top: 100%;
+    left: 0;
+    padding: 10px;
+    margin-top: 0;
+    border: none;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+}
+
+.navbar-nav .dropdown .dropdown-item {
+    font-family: Arial, ui-monospace;
+    font-weight: bold;
+    float: none;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    color: #32827B; /* Màu chữ trắng trong dropdown */
+    padding: 10px;
+    transition: background-color 0.3s, color 0.3s, border-radius 0.3s;
+}
+
+/* Khi hover trên các mục trong dropdown */
+.navbar-nav .dropdown .dropdown-item:hover {
+    color: #F5D26E; /* Màu chữ đen khi hover */
+    background-color: #32827B; /* Nền trắng khi hover */
+    border-radius: 10px;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.button-search {
+    background-color: transparent;
+    color: #32827B;
+    border: 2px solid #32827B;
+    border-radius: 5px;
+    height: 37px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button-search:hover {
+    background-color: #32827B; /* Màu nền khi hover */
+    color: white;
+}
+
+.user-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+    margin-right: 15px;
+    font-size: 20px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+    color: #32827B;
+}
+
+.user-icon:hover {
+    color: #F0982D;
+    text-decoration: none;
+}
+
+.cart-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-top: 10px;
+    font-size: 20px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+    color: #32827B;
+}
+
+.cart-icon:hover {
+    color: #F0982D;
+    text-decoration: none;
+}
+
+/* Footer */
+.footer-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.footer-content {
+    color: #32827B;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.footer-nav-link {
+    color: #32827B;
+    text-decoration: none;
+}
+
+.footer-nav-link:hover {
+    color: #F0982D;
+    text-decoration: none;
+}
+
+.social-media-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    margin-top: 10px;
+    border-radius: 50%;
+    font-size: 20px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+    color: black;
+}
+
+.social-media-btn:hover {
+    background-color: #32827B;
+    color: white;
+    text-decoration: none;
+}

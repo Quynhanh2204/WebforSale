@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f9f9f9;
+        }
+        .order-container {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .shipping-info {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 5px;
+        }
+        .delivery-address {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 5px;
+        }
+        .product-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .product-item img {
+            max-width: 120px;
+            border-radius: 10px;
+            margin-right: 20px;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-info h5 {
+            font-weight: bold;
+        }
+        .product-info .attributes {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .product-info .price-info span {
+            display: block;
+        }
+        .total-price {
+            font-weight: bold;
+            color: #000;
+        }
+        .popup-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+            text-align: center;
+        }
+        .popup-content button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container my-4">
+    <div class="shipping-info">
+        <h4>Thông tin vận chuyển</h4>
+        <p><strong>Phương thức vận chuyển:</strong> <span id="shipping-method"></span></p>
+    </div>
+    <div id='delivery-infor'  class="delivery-address">
+        <h4>Địa chỉ nhận hàng</h4>
+    </div>
+    <div class="order-container">
+        <h4>Chi tiết đơn hàng</h4>
+        <p><strong>Mã đơn hàng:</strong> <span id="order-id"></span></p>
+        <p><strong>Ngày đặt hàng:</strong> <span id="order-date"></span></p>
+        <p><strong>Trạng thái:</strong> <span id="order-status"></span></p>
+        <div id="cancel-section" style="display: none;">
+            <p><strong>Ngày hủy:</strong> <span id="cancel-date"></span></p>
+            <p><strong>Lý do hủy:</strong> <span id="cancel-reason"></span></p>
+        </div>
+        <div id="return-section" style="display: none;">
+            <p><strong>Ngày hoàn trả:</strong> <span id="return-date"></span></p>
+            <p><strong>Lý do hoàn trả:</strong> <span id="return-reason"></span></p>
+        </div>
+        <hr>
+        <div id="product-list"></div> <!-- Hiển thị sản phẩm tại đây -->
+        <hr>
+        <div class="d-flex justify-content-between">
+            <h5>Tổng cộng: <span id="total-price"></span>₫</h5>
+            <div id="action-buttons">
+                <!-- Các nút sẽ được thêm vào đây -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="cancel-popup" class="popup-container">
+    <div class="popup-content">
+        <h5>Chọn lý do hủy đơn hàng</h5>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form_cancel.as_p }}  <!-- Hiển thị form hủy -->
+            <button style="width: 100%;" type="submit" name="cancel-btn" class="btn btn-danger">Xác nhận</button>
+        </form>
+        <button style="width: 100%;" class="btn btn-secondary" onclick="closePopup('cancel-popup')">Thoát</button>
+    </div>
+</div>
+
+<!-- Popup hoàn trả -->
+<div id="return-popup" class="popup-container">
+    <div class="popup-content">
+        <h5>Chọn lý do hoàn trả đơn hàng</h5>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form_return.as_p }}  <!-- Hiển thị form hoàn trả -->
+            <button style="width: 100%;" type="submit" name="return-btn" class="btn btn-warning">Xác nhận</button>
+        </form>
+        <button style="width: 100%;" class="btn btn-secondary" onclick="closePopup('return-popup')">Thoát</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   const order_id = "{{ order_id }}";  // Lấy Order ID từ template
+   console.log("Order ID:", order_id);
+
+   // Lấy dữ liệu từ API bằng Order ID
+   fetch(`/api/orders-detail/${order_id}/`)
+       .then(response => response.json())
+       .then(data => {
+           console.log(data);  // Kiểm tra dữ liệu trả về từ API
+           function formatDateTime(dateString) {
+                const date = new Date(dateString);
+
+                // Định dạng ngày
+                const formattedDate = new Intl.DateTimeFormat('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                }).format(date);
+
+                // Định dạng giờ
+                const formattedTime = new Intl.DateTimeFormat('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }).format(date);
+
+                // Ghép ngày và giờ
+                return `${formattedDate} ${formattedTime}`;
+            }
+
+           // Hiển thị thông tin phương thức vận chuyển
+           document.getElementById('shipping-method').innerText = data.shipment_method;
+
+           // Hiển thị thông tin địa chỉ nhận hàng
+           // Kiểm tra xem data.delivery_info có phải là một mảng hợp lệ không
+            const deliveryInforContainer = document.getElementById('delivery-infor');
+            if (data.Delivery_Infor && typeof data.Delivery_Infor === 'object') {
+                const delivery = data.Delivery_Infor;
+                const deliveryDiv = document.createElement('div');
+                deliveryDiv.classList.add('delivery-infor-item');
+                deliveryDiv.innerHTML = `
+                    <p><strong>Tên:</strong> ${delivery.Name}</p>
+                    <p><strong>Số điện thoại: </strong><span>(+89)</span> ${delivery.Phone_Number}</p>
+                    <p><strong>Địa chỉ:</strong> ${delivery.Address}</p>
+                `;
+                deliveryInforContainer.appendChild(deliveryDiv);
+            } else {
+                deliveryInforContainer.innerHTML = '<p>Không có thông tin địa chỉ giao hàng.</p>';
+            }
+
+
+            // Hiển thị thông tin đơn hàng
+           document.getElementById('order-id').innerText = data.Order_ID;
+           document.getElementById('order-date').innerText = formatDateTime(data.Order_Date);
+           document.getElementById('order-status').innerText = data.Order_Status;
+
+           // Nếu có thông tin hủy
+           if (data.Cancel_Date) {
+               document.getElementById('cancel-date').innerText = formatDateTime(data.Cancel_Date);
+               document.getElementById('cancel-reason').innerText = data.get_Reason_display;
+               document.getElementById('cancel-section').style.display = 'block';
+           }
+
+           // Nếu có thông tin hoàn trả
+           if (data.Return_Date) {
+               document.getElementById('return-date').innerText = formatDateTime(data.Return_Date);
+               document.getElementById('return-reason').innerText = data.get_Return_Reason_display;
+               document.getElementById('return-section').style.display = 'block';
+           }
+
+           // Hiển thị danh sách sản phẩm
+           const productList = document.getElementById('product-list');
+           data.orderdetail.forEach(detail => {
+               const productItem = document.createElement('div');
+               productItem.classList.add('product-item');
+               productItem.innerHTML = `
+                    <img src="${detail.ProductImage ? detail.ProductImage : '/path/to/default-image.jpg'}" alt="${detail.Product.Product_Name}">
+                    <div class="product-info">
+                        <h5>${detail.Product.Product_Name}</h5>
+                        <p class="attributes">Màu sắc: ${detail.Product.Color}</p>
+                        <div class="price-info">
+                            <span>Đơn giá: ${parseInt(detail.Product.Unit_Price).toLocaleString('vi-VN')}₫</span>
+                            <span>Số lượng: ${detail.Quantity}</span>
+                            <span>Thành tiền: ${parseInt(detail.Subtotal).toLocaleString('vi-VN')}₫</span>
+                        </div>
+                    </div>
+                `;
+
+               productList.appendChild(productItem);
+           });
+
+           // Hiển thị tổng tiền
+           document.getElementById('total-price').innerText = data.Total_Price ? parseFloat(data.Total_Price).toLocaleString('vi-VN') : 'Chưa có dữ liệu';
+           // Hiển thị các nút hành động (Hủy, Hoàn trả)
+           const actionButtons = document.getElementById('action-buttons');
+           if (data.Order_Status === 'GIAO THÀNH CÔNG') {
+               // Nếu trạng thái là "Giao thành công", hiển thị nút Hoàn trả
+               const returnButton = document.createElement('button');
+               returnButton.classList.add('btn', 'btn-warning', 'mr-2');
+               returnButton.innerText = 'Hoàn trả';
+               returnButton.onclick = function() {
+                   openPopup('return-popup');
+               };
+               actionButtons.appendChild(returnButton);
+                // Nút Đánh giá
+                const reviewButton = document.createElement('button');
+                reviewButton.classList.add('btn', 'btn-success', 'mr-2');
+                reviewButton.innerText = 'Đánh giá';
+                reviewButton.onclick = function() {
+                    window.location.href = `/orders/${order_id}/review`; // Điều hướng tới trang đánh giá
+                };
+                actionButtons.appendChild(reviewButton);
+
+                // Nút Mua lại
+                const reorderButton = document.createElement('button');
+                reorderButton.classList.add('btn', 'btn-primary');
+                reorderButton.innerText = 'Mua lại';
+                reorderButton.onclick = function() {
+                    // Gửi yêu cầu thêm sản phẩm vào giỏ hàng hoặc điều hướng
+                    fetch(`/orders/${order_id}/reorder`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Đã thêm sản phẩm vào giỏ hàng!');
+                            window.location.href = '/cart'; // Điều hướng tới giỏ hàng
+                        } else {
+                            alert('Không thể mua lại. Vui lòng thử lại sau.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Có lỗi xảy ra, vui lòng thử lại.');
+                    });
+                };
+                actionButtons.appendChild(reorderButton);
+            }
+
+
+           if (data.Order_Status === 'ĐƠN HÀNG MỚI') {
+               // Nếu trạng thái là "Đơn hàng mới", hiển thị nút Hủy
+               const cancelButton = document.createElement('button');
+               cancelButton.classList.add('btn', 'btn-danger', 'mr-2');
+               cancelButton.innerText = 'Hủy đơn';
+               cancelButton.onclick = function() {
+                   openPopup('cancel-popup');
+               };
+               actionButtons.appendChild(cancelButton);
+
+               // Xác nhận đơn hàng
+               const confirmButton = document.createElement('button');
+               confirmButton.classList.add('btn', 'btn-warning');
+               confirmButton.innerText = 'Xác nhận';
+               confirmButton.onclick = function() {
+                    // Gửi yêu cầu xác nhận đơn hàng qua API hoặc cập nhật trạng thái trực tiếp trong JavaScript
+                    fetch(`/orders/${order_id}/confirm`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'  // Đảm bảo gửi CSRF token nếu cần
+                        },
+                        body: JSON.stringify({ order_status: 'DA_XAC_NHAN' })  // Gửi trạng thái mới
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Nếu thành công, cập nhật giao diện và hiển thị thông báo
+                        if (data.success) {
+                            document.getElementById('order-status').innerText = data.Order_Status;
+                            confirmButton.style.display = 'none';
+                            cancelButton.style.display = 'none';
+                            alert('Đơn hàng đã được xác nhận!');
+                        } else {
+                            alert('Có lỗi xảy ra, vui lòng thử lại.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Có lỗi xảy ra, vui lòng thử lại.');
+                    });
+                };
+                actionButtons.appendChild(confirmButton);
+
+
+
+       }})
+       .catch(error => console.error('Error fetching order details:', error));
+});
+
+function openPopup(popupId) {
+    document.getElementById(popupId).style.display = 'flex';
+}
+
+function closePopup(popupId) {
+    document.getElementById(popupId).style.display = 'none';
+}
+
+function cancelOrder() {
+    console.log('Đơn hàng đã hủy');
+    closePopup('cancel-popup');
+}
+
+function returnOrder() {
+    console.log('Đơn hàng đã được hoàn trả');
+    closePopup('return-popup');
+}
+
+</script>
+</body>
+</html>
+{% endblock %}

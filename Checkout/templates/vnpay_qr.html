@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán VNPay</title>
+</head>
+<body>
+    <h1>Thanh Toán VNPay</h1>
+
+    <p>Đơn hàng: {{ order.Order_ID }}</p>
+    <p>Tổng tiền: {{ order.Total_Price }}</p>
+
+    <div>
+        <p>Quét mã QR để thanh toán:</p>
+        <img src="data:image/png;base64,{{ qr_base64 }}" alt="Mã QR thanh toán VNPay">
+    </div>
+
+    <p><a href="{% url 'base' %}">Trở về trang chủ</a></p>
+</body>
+</html>

@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ product.Product_Name }}{% endblock %}
+{% block content %}
+<!-- Liên kết đến CSS cô lập -->
+<link rel="stylesheet" href="{% static 'css/productdetail.css' %}">
+
+<div class="product-detail-page">
+    <div class="product-detail-container row">
+        <!-- Cột Hình Ảnh Sản Phẩm -->
+        <div class="product-images col-md-6">
+            {% if primary_image %}
+                <img src="{{ primary_image.Image_Url }}" alt="{{ primary_image.Alt_Text }}" class="img-fluid mb-3 main-image">
+            {% endif %}
+        </div>
+
+        <!-- Cột Thông Tin Sản Phẩm -->
+        <div class="product-info col-md-6">
+            <!-- Tên sản phẩm và giá -->
+            <div class="product-header">
+                <h2>{{ product.Product_Name }}</h2>
+                <p class="price" style="color: #e63946; font-size: 24px; font-weight: bold;">{{ product.Unit_Price }} VND</p>
+            </div>
+
+            <!-- Số lượng -->
+            <div class="quantity-wrapper mb-3">
+                <label for="quantity-value" class="quantity-label">Số lượng</label>
+                <div class="quantity">
+                    <button type="button" id="decrease-button" class="btn-quantity minus">-</button>
+                    <input type="number" id="quantity-value" name="quantity" value="1" min="1">
+                    <button type="button" id="increase-button" class="btn-quantity plus">+</button>
+                </div>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="button-group d-flex gap-2 align-items-center">
+                <!-- Nút Mua ngay -->
+                <form method="POST" action="{% url 'buy_now' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn buy-now-button">Mua ngay</button>
+                </form>
+
+                <!-- Nút Thêm vào giỏ hàng -->
+                <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="cart-quantity" name="quantity" value="1">
+                    <button type="submit" class="btn add-to-cart-button">Thêm vào giỏ hàng</button>
+                </form>
+            </div>
+
+<!-- Tab Navigation -->
+<div class="tabs">
+    <a href="#description" class="tablinks" id="tab-description">Mô tả</a>
+    <a href="#product_info" class="tablinks" id="tab-info">Thông tin sản phẩm</a>
+    <a href="#product_specs" class="tablinks" id="tab-specs">Thông số sản phẩm</a>
+</div>
+
+<!-- Tab Content -->
+<div id="description" class="tabcontent">
+    <h3>Mô tả</h3>
+    <p class="description">{{ description }}</p>
+</div>
+
+<div id="product_info" class="tabcontent">
+    <h3>Thông tin sản phẩm</h3>
+    {% if product.Category_id == 1 %}
+        <ul>
+            <li>Túi vải canvas đeo 1 bên vai dáng cơ bản</li>
+            <li>Túi được in chữ bằng kỹ thuật in nhiệt bền màu</li>
+            <li>Có 2 quai đeo song song với nhau, dài 60cm - Vừa A4, 14 inch</li>
+            <li>Trong túi có một lớp lót bằng vải dù chắc chắn.</li>
+            <li>Trên miệng túi còn được may thêm một đường dây khoá túi, nhằm tránh các trường hợp rơi, rớt đồ dùng.</li>
+            <li>Túi được gia công tỉ mỉ, được kiểm tra kỹ càng nhằm tránh các lỗi thường gặp như: thừa chỉ khâu, đường may chưa đều,…</li>
+        </ul>
+    {% elif product.Category_id == 3 %}
+        <ul>
+            <li><strong>Chất liệu:</strong> Hợp kim thép không gỉ sét</li>
+            <li><strong>Kích thước:</strong> Đường kính 3cm</li>
+        </ul>
+    {% elif product.Category_id == 2 %}
+        <ul>
+            <li><strong>Chất liệu:</strong> Hợp kim thép không gỉ sét</li>
+            <li><strong>Kích thước:</strong> 8cm x 3cm</li>
+        </ul>
+    {% elif product.Category_id == 4 %}
+        <ul>
+            <li><strong>Chất liệu:</strong> Giấy Chipboard</li>
+            <li><strong>Kích thước:</strong> 12cm x 8cm</li>
+        </ul>
+    {% endif %}
+</div>
+
+<div id="product_specs" class="tabcontent">
+    <h3>Thông số sản phẩm</h3>
+    {% if product.Category_id == 1 %}
+        <ul>
+            <li><strong>Chất liệu:</strong> Vải canvas</li>
+            <li><strong>Kích thước:</strong> Ngang 35cm x Cao 40 cm</li>
+            <li><strong>Sức chứa:</strong> 3 kg</li>
+            <li><strong>Khối lượng:</strong> 300g</li>
+        </ul>
+    {% elif product.Category_id == 3 %}
+        <ul>
+            <li><strong>Chất liệu:</strong> Hợp kim thép không gỉ sét</li>
+            <li><strong>Kích thước:</strong> Đường kính 3cm</li>
+        </ul>
+    {% elif product.Category_id == 2 %}
+        <ul>
+            <li><strong>Chất liệu:</strong> Hợp kim thép không gỉ sét</li>
+            <li><strong>Kích thước:</strong> 8cm x 3cm</li>
+        </ul>
+    {% elif product.Category_id == 4 %}
+        <ul>
+            <li><strong>Chất liệu:</strong> Giấy Chipboard</li>
+            <li><strong>Kích thước:</strong> 12cm x 8cm</li>
+        </ul>
+    {% endif %}
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash === '') {
+        document.getElementById('description').style.display = 'block';
+        document.querySelector('a[href="#description"]').classList.add('active');
+    } else {
+        const hash = window.location.hash.substring(1);
+        const activeTab = document.getElementById(hash);
+        if (activeTab) {
+            const tabContents = document.querySelectorAll('.tabcontent');
+            tabContents.forEach(content => content.style.display = 'none');
+            activeTab.style.display = 'block';
+            const tabLinks = document.querySelectorAll('.tablinks');
+            tabLinks.forEach(link => link.classList.remove('active'));
+            document.querySelector(`a[href="#${hash}"]`).classList.add('active');
+        }
+    }
+    const tabLinks = document.querySelectorAll('.tablinks');
+    tabLinks.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tabId = tab.getAttribute('href').substring(1); // Lấy ID từ href
+            const tabContents = document.querySelectorAll('.tabcontent');
+            tabContents.forEach(content => content.style.display = 'none');
+            document.getElementById(tabId).style.display = 'block';
+            tabLinks.forEach(link => link.classList.remove('active'));
+            tab.classList.add('active');
+            history.pushState(null, null, `#${tabId}`);
+        });
+    });
+    const quantityElement = document.getElementById('quantity-value');
+    const increaseButton = document.getElementById('increase-button');
+    const decreaseButton = document.getElementById('decrease-button');
+    const cartQuantityInput = document.getElementById('cart-quantity');
+
+    increaseButton.addEventListener('click', function () {
+        let currentQuantity = parseInt(quantityElement.value);
+        quantityElement.value = currentQuantity + 1;
+        cartQuantityInput.value = quantityElement.value;
+    });
+
+    decreaseButton.addEventListener('click', function () {
+        let currentQuantity = parseInt(quantityElement.value);
+        if (currentQuantity > 1) {
+            quantityElement.value = currentQuantity - 1;
+            cartQuantityInput.value = quantityElement.value;
+        }
+    });
+
+    quantityElement.addEventListener('input', function () {
+        if (parseInt(quantityElement.value) < 1) {
+            quantityElement.value = 1;
+            cartQuantityInput.value = quantityElement.value;
+        }
+    });
+});
+</script>
+        </div>
+    </div>
+
+    <!-- Phần Đánh giá Sản phẩm -->
+    <div class="reviews">
+        <h3>Đánh giá sản phẩm</h3>
+        {% for review in reviews %}
+            <div class="review-item">
+                <div class="review-header">
+                    <span>{{ review.Customer.Name }}</span>
+                    <div class="rating">{{ review.Rating }} Stars</div>
+                    <span>{{ review.Date_Created }}</span>
+                </div>
+                <div class="content">
+                    {{ review.Content }}
+                </div>
+            </div>
+        {% empty %}
+            <p class="no-reviews">Hiện tại sản phẩm chưa có đánh giá nào, bạn hãy trở thành người đầu tiên đánh giá cho sản phẩm này.</p>
+        {% endfor %}
+    </div>
+    <!-- Các sản phẩm tương tự -->
+<section class="similar-products">
+    <h3>Sản phẩm tương tự</h3>
+    <div class="product-grid">
+        {% for product in similar_products %}
+            <div class="product-item">
+            <a href="{% url 'product_detail' product_id=product.id %}">
+              <img src="{{ product.primary_image.Image_Url }}" alt="{{ product.Product_Name }}">
+            </a>
+            <h3>
+              <a href="{% url 'product_detail' product_id=product.id %}">{{ product.Product_Name }}</a>
+            </h3>
+            <p class="price">{{ product.Unit_Price}}đ</p>
+          </div>
+        {% empty %}
+            <p>Không có sản phẩm tương tự.</p>
+        {% endfor %}
+    </div>
+</section>
+
+</div>
+
+{% endblock %}

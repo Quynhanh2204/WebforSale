@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Liên kết đến CSS cô lập -->
+<link rel="stylesheet" href="/static/css/checkout.css">
+
+<div class="container">
+<h1>Thanh toán</h1>
+
+    <div class="checkout-wrapper">
+        <div class="checkout-left">
+            <h2>Thông tin giao hàng</h2>
+            <form method="post" action="{% url 'checkout' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="Name">Tên người nhận</label>
+                    <input type="text" name="Name" id="Name" placeholder="Nhập tên người nhận" required="">
+                </div>
+
+                <div class="form-group">
+                    <label for="Phone_Number">Số điện thoại</label>
+                    <input type="text" name="Phone_Number" id="Phone_Number" placeholder="Nhập số điện thoại" required="">
+                </div>
+
+                <div class="form-group">
+                    <label for="Address">Địa chỉ giao hàng</label>
+                    <textarea name="Address" id="Address" placeholder="Nhập địa chỉ giao hàng" required=""></textarea>
+                </div>
+
+                <h2>Phương thức thanh toán</h2>
+                <div class="form-group">
+                    <select name="Payment_Method" id="Payment_Method" required>
+                        <option value="1">VNPay</option>
+                        <option value="2">Thanh toán khi nhận hàng (COD)</option>
+                    </select>
+                </div>
+
+                <h2>Phương thức vận chuyển</h2>
+                <div class="form-group">
+                    <label for="Shipment_Method"></label><select name="Shipment_Method" id="Shipment_Method" required>
+                    <option value="1">Giao hàng tiêu chuẩn</option>
+                    <option value="2">Giao hàng nhanh</option>
+                    </select>
+                </div>
+
+                <input type="hidden" id="discount-code-hidden" name="Discount_Code">
+
+                <button type="submit" class="checkout-button">Đặt hàng</button>
+            </form>
+        </div>
+        <div class="checkout-right">
+            <div class="checkout-right">
+            <h2>Chi tiết đơn hàng</h2>
+            <div class="order-summary">
+                <!-- Danh sách sản phẩm -->
+                <div class="product-list">
+                    <ul>
+                        {% for cart_item in cart_items %}
+                        <li>
+                            <div class="product-info">
+                                    {% if cart_item.ProductPrimaryImage %}
+                                    <img src="{{ cart_item.ProductPrimaryImage.Image_Url }}"
+                                        alt="{{ cart_item.ProductPrimaryImage.Alt_Text }}"
+                                        class="img-fluid mb-3 main-image">
+                                    {% endif %}
+                             </div>
+                            <div class="product-info">
+                                <span class="product-name">Sản phẩm: {{ cart_item.ProductName }}</span>
+                            </div>
+                            <div class="product-info">
+                                <span class="product-Quantity">Số lượng: {{ cart_item.Quantity }}</span>
+                            </div>
+                            <div class="product-info">
+                                <span class="product-Unit_Price">Giá: {{ cart_item.UnitPrice }}đ</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Chọn mã giảm giá -->
+                <div class="form-group">
+                    <label for="Discount_Code">Mã giảm giá</label>
+                    <select name="Discount_Code" id="Discount_Code">
+                        <option value="">Chọn mã giảm giá</option>
+                        <option value="DISCOUNT10">DISCOUNT10 - 10%</option>
+                        <option value="BLACKFRIDAY15">BLACKFRIDAY15 - 15%</option>
+                    </select>
+
+                    <button type="button" id="apply_discount" class="apply-discount-button">Áp dụng</button>
+                </div>
+                <!-- Hiển thị giảm giá -->
+                <div id="discount_section" class="order-discount" style="display:none;">
+                    <span>Giảm giá: </span><span id="discount_amount">{{ discount_amount }}</span>%
+                </div>
+
+                <hr>
+                <!-- Tổng tạm tính -->
+                <div class="order-subtotal">
+                    <span>Tạm tính:</span>
+                    <span class="Subtotal">{{ total_subtotal }}đ</span>
+                </div>
+
+                <!-- Phí vận chuyển -->
+                <div class="order-shipping">
+                    <span>Phí vận chuyển:</span>
+                    <span class="Shipping_cost">{{ Method_Cost }}đ</span>
+                </div>
+
+                <!-- Tổng cộng -->
+                <div class="order-total">
+                    <span>Tổng cộng:</span>
+                    <span class="Total_Price">{{ total_price }}đ</span>
+                </div>
+            </div>
+
+
+            <div class="back-buttons">
+                <a href="{% url 'cart' %}" class="back-button">Quay lại giỏ hàng</a>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Hàm định dạng tiền theo kiểu Việt Nam
+    function formatCurrency(value) {
+        return value.toLocaleString('vi-VN') + ' đ';
+    }
+
+    // Cập nhật tổng tiền sau khi thay đổi phương thức vận chuyển hoặc mã giảm giá
+    function updateTotalPrice() {
+        // Lấy tổng giá trị ban đầu từ localStorage
+        var total_price = parseFloat(localStorage.getItem("total_subtotal")) || 0;
+
+        // Lấy giá trị giảm giá và phí vận chuyển từ DOM và chuyển sang kiểu số
+        var discount = parseFloat(document.getElementById('discount_amount').textContent.replace(' đ', '').replace('.', '')) || 0;
+        var shippingCost = parseFloat(document.querySelector('.Shipping_cost').textContent.replace(' đ', '').replace('.', '')) || 0;
+
+        // Tính tổng tiền sau khi trừ đi giảm giá và cộng thêm phí vận chuyển
+        var newTotalPrice = total_price - discount + shippingCost;
+
+        // Cập nhật lại tổng tiền
+        document.querySelector('.Total_Price').textContent = formatCurrency(newTotalPrice);
+    }
+
+    // Lắng nghe sự kiện thay đổi phương thức vận chuyển
+    document.getElementById('Shipment_Method').addEventListener('change', function () {
+        var shipmentMethodValue = this.value;
+
+        if (shipmentMethodValue) {
+            // Gửi yêu cầu AJAX đến server để kiểm tra hoặc xử lý phương thức vận chuyển
+            fetch(`/check_shipment_method/?shipment_method=${shipmentMethodValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.valid) {
+                        // Cập nhật phí vận chuyển
+                        var shippingCost = data.method_cost || 0;
+                        document.querySelector('.Shipping_cost').textContent = formatCurrency(shippingCost);
+                        var total_price = parseFloat(localStorage.getItem("total_subtotal")) || 0;
+
+                        // Tính giá trị giảm giá (dựa vào giá trị % từ dữ liệu trả về)
+                        var discount = total_price * (data.discount_value);  // data.discount_value là % giảm giá
+
+                        // Hiển thị phần giảm giá
+                        document.getElementById('discount_section').style.display = 'block';
+                        document.getElementById('discount_amount').textContent = formatCurrency(discount);
+
+                        // Cập nhật lại tổng tiền sau khi tính phí vận chuyển
+                        updateTotalPrice();
+                    } else {
+                        alert("Phương thức vận chuyển không hợp lệ.");
+                    }
+                });
+        }
+    });
+
+    // JavaScript xử lý sự kiện nhấn nút Áp dụng mã giảm giá
+    document.getElementById('apply_discount').addEventListener('click', function () {
+        var discountCode = document.getElementById('Discount_Code').value.trim();
+        const discountCodeHidden = document.getElementById('discount-code-hidden');
+        if (discountCode) {
+            // Gửi mã giảm giá đến server để kiểm tra (sử dụng Ajax)
+            fetch(`/check-discount/?code=${discountCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.valid) {
+                        var total_price = parseFloat(localStorage.getItem("total_subtotal")) || 0;
+
+                        // Tính giá trị giảm giá (dựa vào giá trị % từ dữ liệu trả về)
+                        var discount = total_price * (data.discount_value);  // data.discount_value là % giảm giá
+
+                        // Hiển thị phần giảm giá
+                        document.getElementById('discount_section').style.display = 'block';
+                        document.getElementById('discount_amount').textContent = formatCurrency(discount);
+
+                        // Cập nhật lại tổng tiền sau khi giảm giá
+                        updateTotalPrice();
+
+                        // Lưu ID mã giảm giá vào hidden field
+                        discountCodeHidden.value = data.discount_id;
+                    } else {
+                        alert("Mã giảm giá không hợp lệ.");
+                    }
+                });
+        }
+    });
+
+</script>
+
+<script>
+    // Lấy giá trị 'total_subtotal' từ Django context và lưu vào localStorage
+    var totalSubtotal = "{{ total_subtotal_To_Cal }}";  // Lấy giá trị từ context và lưu vào biến JS
+    localStorage.setItem('total_subtotal', totalSubtotal);  // Lưu giá trị vào localStorage
+    // console.log("Total Subtotal saved in localStorage: " + localStorage.getItem('total_subtotal'));
+</script>
+<script>
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- styles.css -->
+    <link rel="stylesheet" href="{% static 'css/styles_base.css' %}">
+    <!-- font awesome css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <title>{% block title %}Home{% endblock %}</title>
+
+</head>
+
+<body>
+    <nav style="background-color: #F5D26E; display: flex; justify-content: center;" class="navbar navbar-expand-sm sticky-top">
+        <div style="width: 300px; display: flex; justify-content: center;">
+            <img style="width: 80px; height: 80px;" src="{% static 'images/logo.png' %}"/>
+        </div>
+
+        <div class="navbar-nav">
+            <div class="nav-item active">
+                <a class="nav-link" href="{% url 'base' %}">Trang chủ<span class="sr-only">(current)</span></a>
+            </div>
+
+            <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="{% url 'product_list' %}" id="navbarDropdownMenuLink" role="button" aria-haspopup="true" aria-expanded="false">
+                    Sản phẩm
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{% url 'category_product_list' 1 %}">Túi tote</a>
+                    <a class="dropdown-item" href="{% url 'category_product_list' 2 %}">Móc khóa</a>
+                    <a class="dropdown-item" href="{% url 'category_product_list' 3 %}">Pin</a>
+                    <a class="dropdown-item" href="{% url 'category_product_list' 4 %}">Nametag</a>
+                </div>
+            </div>
+
+<!--            <div class="nav-item">-->
+<!--                <a class="nav-link" href="#">Blog</a>-->
+<!--            </div>-->
+
+<!--            <div class="nav-item">-->
+<!--                <a class="nav-link" href="#">Giới thiệu</a>-->
+<!--            </div>-->
+
+            <div class="nav-item">
+                <a class="nav-link" href="#">Liên hệ</a>
+            </div>
+        </div>
+
+        <div style="width: 60px; display: inline-flex;" class="dropdown">
+            <a href="{% url 'profile' %}" class="user-icon">
+                <i class="fa-solid fa-user"></i>
+            </a>
+
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="{% url 'profile' %}">Thông tin</a>
+                <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
+            </div>
+        </div>
+
+        <div style="width: 60px; display: inline-flex;" >
+            <a href="{% url 'cart' %}" class="cart-icon" style="position: relative;">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span id="cart-count" style="position: absolute; top: -10px; right: -10px; background-color: red; color: white; border-radius: 50%; padding: 5px 10px; font-size: 12px;">
+                    {{ cart_count }}  <!-- Hiển thị số lượng giỏ hàng -->
+                </span>
+            </a>
+        </div>
+
+        <div style="width: 600px; display: flex; justify-content: center;">
+            <form class="form-inline mx-2 my-2 my-lg-0" method="GET" action="{% url 'search_products' %}">
+                <input
+                class="form-control mr-sm-2"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                name="search"
+                value="{{ search }}"
+                minlength="3"
+                style="width: 300px;"
+                >
+
+                <button class="button-search" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.level_tag == 'error' %}danger{% else %}{{ message.level_tag }}{% endif %}"
+              role="alert">
+             {{ message }}
+            </div>
+        {% endfor %}
+
+        <div style="margin-bottom: 230px;">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Copyright -->
+    <footer style="background-color: #F5D26E; width: 100%; height: 220px; display: flex; flex-direction: row; justify-content: center; align-items: center;" class="page-footer font-small blue">
+        <div style="display: flex; gap: 20px; flex: 1;">
+            <div style="width: 35%; margin-left: 80px;">
+            <span class="footer-title">tote.tout</span><br>
+            <span style="color: #32827B;">Everything. In a tote</span><br>
+            <span>
+              <a href="https://www.facebook.com/tote.tout" target="_blank" class="social-media-btn">
+                <i class="fa-brands fa-facebook"></i>
+              </a>
+            </span>
+            <span>
+              <a href="https://www.instagram.com/tote.tout?fbclid=IwY2xjawGVqGVleHRuA2FlbQIxMAABHbW9BWfkJze_DjvrspdZfyt6u7eUVPx2zFIPloiU9Nxzeu2VVkvKx5UGuA_aem_XamU7j1-l9xIkw0PKbRKHw" target="_blank" class="social-media-btn">
+                <i class="fa-brands fa-instagram"></i>
+              </a>
+            </span>
+            <span>
+              <a href="https://www.tiktok.com/@tote.tout?fbclid=IwY2xjawGVqGdleHRuA2FlbQIxMAABHWdde3jMzk-zBvWdS7j-B0gMl_YrtWrGvQ5_bplBmRS6S-jHPuf53RfJJg_aem_07av1V3vJBMVmOKIyxxPBA" target="_blank" class="social-media-btn">
+                <i class="fa-brands fa-tiktok"></i>
+              </a>
+            </span><br>
+            <span style="display: flex; margin-top: 20px;"><i class="fa-solid fa-location-dot"></i><h4 style="color: #32827B; font-size: 14px; margin-left: 14px;">71 Ngũ Hành Sơn, quận Ngũ Hành Sơn, Đà Nẵng</h4></span>
+            <span style="display: flex;"><i class="fa-solid fa-envelope" style="margin-top: 1px;"></i><h4 style="color: #32827B; font-size: 14px; margin-left: 10px;">tote.toutstore@gmail.com</h4></span>
+            <span style="display: flex;"><i class="fa-solid fa-phone"></i><h4 style="color: #32827B; font-size: 14px; margin-left: 10px;">032 5657 642</h4></span>
+            </div>
+
+            <div style="width: 35%; display: flex; flex-direction: column; align-items: center;">
+            <span class="footer-title">Về chúng tôi</span>
+            <span class="footer-content"><a class="footer-nav-link" href="#">Trang chủ</a></span>
+            <span class="footer-content"><a class="footer-nav-link" href="#">Sản phẩm</a></span>
+            <span class="footer-content"><a class="footer-nav-link" href="#">Blog</a></span>
+            <span class="footer-content"><a class="footer-nav-link" href="#">Giới thiệu</a></span>
+            <span class="footer-content"><a class="footer-nav-link" href="#">Liên hệ</a></span>
+            </div>
+
+            <div style="width: 35%; display: flex; flex-direction: column; align-items: center;">
+            <span class="footer-title">Các chính sách</span>
+            <span class="footer-content"><a class="footer-nav-link" href="http://127.0.0.1:8000/chinh-sach-doi-tra/">Chính sách đổi trả</a></span>
+            <span class="footer-content"><a class="footer-nav-link" href="http://127.0.0.1:8000/chinh-sach-thanh-toan/">Chính sách thanh toán</a></span>
+            <span class="footer-content"><a class="footer-nav-link" href="http://127.0.0.1:8000/chinh-sach-giao-hang/">Chính sách giao hàng</a></span>
+            <span class="footer-content"><a class="footer-nav-link" href="http://127.0.0.1:8000/huong-dan-mua-hang/">Hướng dẫn mua hàng</a></span>
+            </div>
+
+            <div style="width: 30%; display: flex; flex-direction: column; justify-content: center; color: #32827B;" class="footer-copyright text-center py-3">
+            <span>&copy; 2024 Copyright: Tote.Tout</span>
+            <p>Website by: Tote.Tout</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

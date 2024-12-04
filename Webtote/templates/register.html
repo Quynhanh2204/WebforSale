@@ -1,0 +1,62 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký</title>
+    <link rel="stylesheet" href="{% static 'css/stylesregister.css' %}">
+</head>
+<body>
+
+{% block content %}
+<section class="gradient-custom-yellow">
+    <div class="card">
+        <div class="register-container">
+            <h2 class="register-title">Đăng ký tài khoản</h2>
+
+            <!-- Hiển thị thông báo lỗi nếu có -->
+            {% if messages %}
+                <div class="alert alert-danger">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Form đăng ký -->
+            <form action="{% url 'register' %}" method="post" class="register-form">
+                {% csrf_token %}
+
+                <!-- Trường tên đăng nhập -->
+                <div class="form-group">
+                    {{ form.username.errors }}
+                    <input type="text" name="username" class="form-control" placeholder="Tên đăng nhập" required>
+                </div>
+
+                <div class="form-group">
+                {{ form.password.errors }}
+                <input type="password" name="password1" class="form-control" placeholder="Mật khẩu" required>
+                </div>
+
+                <!-- Trường xác nhận mật khẩu -->
+                <div class="form-group">
+                    {{ form.password2.errors }}
+                    <input type="password" name="password2" class="form-control" placeholder="Nhập lại mật khẩu" required>
+                </div>
+
+                <!-- Nút đăng ký -->
+                <div class="submit-row">
+                    <button type="submit" class="btn btn-primary">Đăng ký</button>
+                </div>
+            </form>
+
+            <p class="mt-3">Bạn đã có tài khoản? <a href="{% url 'login' %}" class="login-link">Đăng nhập</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+/* Cập nhật container chính */
+.product-container .container {
+    margin: 0; /* Loại bỏ bất kỳ khoảng cách mặc định nào */
+    padding: 0; /* Loại bỏ padding */
+    width: 100%; /* Chiếm toàn bộ chiều rộng */
+    box-sizing: border-box;
+}
+
+/* Bố cục tổng thể */
+.product-container .layout {
+    display: flex;
+    align-items: flex-start; /* Căn các phần tử theo chiều dọc */
+    gap: 10px; /* Khoảng cách giữa sidebar và danh sách sản phẩm */
+    width: 100%; /* Chiếm toàn bộ chiều rộng */
+    margin: 0; /* Loại bỏ khoảng cách bên ngoài */
+}
+
+/* Sidebar bộ lọc - 1/4 chiều rộng */
+.product-container .sidebar {
+    flex: 1; /* Chiếm 1 phần của không gian (1/4) */
+    max-width: 20%; /* Giảm chiều rộng tối đa của sidebar để làm gọn */
+    min-width: 180px; /* Đặt chiều rộng tối thiểu để hiển thị tốt */
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều rộng */
+    margin-left: 0; /* Đặt sát phía trái */
+}
+
+/* Danh sách sản phẩm - 3/4 chiều rộng */
+.product-container .product-list {
+    flex: 3; /* Chiếm 3 phần của không gian (3/4) */
+    width: 70%; /* Giảm chiều rộng để làm nhỏ hơn */
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều rộng */
+}
+
+.product-container .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Giảm kích thước tối thiểu của sản phẩm */
+    gap: 15px; /* Giảm khoảng cách giữa các sản phẩm */
+    margin-top: 20px;
+    width: 100%;
+    padding: 0 10px; /* Giảm padding */
+}
+
+/* Kiểu cho các mục sản phẩm */
+.product-container .product-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 10px; /* Giảm padding để làm nhỏ hơn */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.product-container .product-item:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+}
+
+.product-container .product-item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1.2;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
+    margin-bottom: 5px; /* Giảm khoảng cách dưới ảnh */
+}
+
+.product-container .product-item h3 {
+    font-size: 16px; /* Giảm kích thước font để làm nhỏ hơn */
+    margin: 5px 0;
+    font-weight: bold;
+    color: #333;
+}
+
+.product-container .product-item .price {
+    font-size: 14px; /* Giảm kích thước font để làm nhỏ hơn */
+    font-weight: bold;
+    color: #e74c3c;
+    margin-top: 5px;
+}
+
+/* Kiểu cho các phần tử trong sidebar */
+.product-container .filter-section {
+    margin-bottom: 15px; /* Giảm khoảng cách giữa các phần */
+}
+
+.product-container .filter-section h3 {
+    margin-bottom: 5px; /* Giảm khoảng cách dưới tiêu đề */
+}
+
+.product-container .filter-section label {
+    display: block; /* Hiển thị các nhãn checkbox theo hàng dọc */
+    margin-bottom: 3px; /* Giảm khoảng cách giữa các checkbox */
+}
+
+.product-container button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 8px; /* Giảm padding để làm nhỏ nút */
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.product-container button[type="submit"]:hover {
+    background-color: #333;
+}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles_base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/order_status.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+     <title>Quản lý đơn hàng</title>
+    <style>
+        .button{
+            border-radius: 5px;
+            background-color: #32827B;
+            color: white;
+            height: 40px;
+            width: 100px;
+            border: 2px solid black;
+            transition: 0.3s ease background-color;
+        }
+        .button:hover{
+            background-color: white;
+            color: #32827B;
+        }
+        .order-detail-link{
+            color: #32827B;
+        }
+        .order-detail-link:hover{
+            color: black;
+        }
+    </style>
+<div class="container my-4">
+    <h2>Quản lý đơn hàng</h2>
+    <input type="hidden" id="superuser-hidden" value="{{ superuser }}">
+    <input type="hidden" id="customer-id-hidden" value="{{ customer_id }}">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <input type="text" id="search" class="form-control" placeholder="Nhập từ khóa tìm kiếm" style="width: 300px;">
+        <button class="button">Tìm kiếm</button>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Khách hàng</th>
+                <th>Trạng thái</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái vận chuyển</th>
+                <th>Ngày tạo</th>
+                <th>Tổng tiền</th>
+            </tr>
+        </thead>
+        <tbody id="order-table-body">
+            <!-- Data will be injected here by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/orders-view/')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);  // Kiểm tra giá trị trả về
+                const tableBody = document.getElementById('order-table-body');
+                const superuser = document.getElementById('superuser-hidden').value === 'True';
+                const customerId = document.getElementById('customer-id-hidden').value;
+                console.log(customerId)
+                console.log(superuser)
+                data.forEach(order => {
+                    //console.log(order.customer_id)
+                    //console.log(superuser || customerId == order.customer_id)
+                    if (superuser || customerId == order.customer_id) {
+                        console.log(order.Order_ID);  // Kiểm tra Order_ID của từng đơn hàng
+                        const row = document.createElement('tr');
+
+                        // Xác định class CSS cho trạng thái đơn hàng
+                        let statusClass = '';
+                        if (order.Order_Status ==='ĐƠN HÀNG MỚI') {
+                            statusClass = 'status-new';
+                        } else if (order.Order_Status === 'ĐÃ XÁC NHẬN') {
+                            statusClass = 'status-confirmed';
+                        } else if (order.Order_Status === 'ĐANG VẬN CHUYỂN') {
+                            statusClass = 'status-shipping';
+                        } else if (order.Order_Status === 'GIAO THÀNH CÔNG') {
+                            statusClass = 'status-delivered';
+                        } else if (order.Order_Status === 'GIAO KHÔNG THÀNH CÔNG') {
+                            statusClass = 'status-failed';
+                        } else if (order.Order_Status === 'ĐÃ HỦY') {
+                            statusClass = 'status-cancelled';
+                        } else if (order.Order_Status === 'HOÀN TRẢ') {
+                            statusClass = 'status-refunded';
+                        } else if (order.Order_Status === 'TRẢ HÀNG THÀNH CÔNG') {
+                            statusClass = 'status-returned';
+                        }
+
+                        // Xác định class CSS cho tình trạng thanh toán
+                        let paymentClass = '';
+                        if (order.payment_status === 'THANH TOÁN THÀNH CÔNG') {
+                            paymentClass = 'payment-success';
+                        } else if (order.payment_status === 'THANH TOÁN KHÔNG THÀNH CÔNG') {
+                            paymentClass = 'payment-failed';
+                        } else if (order.payment_status === 'HOÀN TRẢ THÀNH CÔNG') {
+                            paymentClass = 'payment-refunded';
+                        }
+
+                        // Xác định class CSS cho trạng thái vận chuyển
+                        let shipmentClass = '';
+                        if (order.shipment_status === 'ĐANG VẬN CHUYỂN') {
+                            shipmentClass = 'shipment-in-progress';
+                        } else if (order.shipment_status === 'GIAO THÀNH CÔNG') {
+                            shipmentClass = 'shipment-complete';
+                        } else if (order.shipment_status === 'GIAO KHÔNG THÀNH CÔNG') {
+                            shipmentClass = 'shipment-failed';
+                        } else if (order.shipment_status === 'ĐÃ HỦY') {
+                            shipmentClass = 'shipment-cancelled';
+                        } else if (order.shipment_status === 'TRẢ HÀNG THÀNH CÔNG') {
+                            shipmentClass = 'shipment-returned';
+                        }
+
+                       row.innerHTML = `
+                            <td><a class="order-detail-link" href="${order.Order_ID ? '/orders/' + order.Order_ID : '#'}" target="_blank"> ${order.Order_ID} </a></td>
+                            <td>${order.customer_name}</td>
+                            <td class="${statusClass}">${order.Order_Status}</td>
+                            <td class="${paymentClass}">${order.payment_status}</td>
+                            <td class="${shipmentClass}">${order.shipment_status}</td>
+                            <td>${new Date(order.Order_Date).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                            <td>${parseInt(order.Total_Price).toLocaleString('vi-VN')}₫</td>
+                       `;
+
+                        tableBody.appendChild(row);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching orders:', error));
+    });
+</script>
+{% endblock %}

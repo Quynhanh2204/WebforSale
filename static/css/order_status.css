@@ -1,0 +1,44 @@
+.button{
+            border-radius: 5px;
+            background-color: #32827B !important;
+            color: white !important;
+            height: 40px;
+            width: 100px;
+            border: 2px solid black;
+            transition: 0.3s ease background-color;
+        }
+        .button:hover{
+            background-color: white !important;
+            color: #32827B !important;
+        }
+        .order-detail-link{
+            color: #32827B !important;
+        }
+        .order-detail-link:hover{
+            color: black !important;
+        }
+
+
+
+
+/* Đặt màu sắc cho trạng thái đơn hàng */
+.status-new { color: blue !important; font-weight: bold; }
+.status-confirmed { color: green !important; font-weight: bold; }
+.status-shipping { color: #197AE8 !important; font-weight: bold; }
+.status-delivered { color: green !important; font-weight: bold; }
+.status-failed { color: red !important; font-weight: bold; }
+.status-cancelled { color: red !important; font-weight: bold; }
+.status-returned { color: purple !important; font-weight: bold; }
+.status-refunded { color: purple !important; font-weight: bold; }
+
+/* Đặt màu sắc cho trạng thái thanh toán */
+.payment-success { color: green !important; font-weight: bold; }
+.payment-failed { color: red !important; font-weight: bold; }
+.payment-refunded { color: purple !important; font-weight: bold; }
+
+/* Đặt màu sắc cho trạng thái vận chuyển */
+.shipment-in-progress { color: orange !important; font-weight: bold; }
+.shipment-complete { color: green !important; font-weight: bold; }
+.shipment-failed { color: red !important; font-weight: bold; }
+.shipment-cancelled { color: red !important; font-weight: bold; }
+.shipment-returned { color: purple !important; font-weight: bold; }

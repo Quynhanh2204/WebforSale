@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}{{ category_name }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/product.css' %}">
+<!-- Thêm CSS của noUiSlider -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.0/nouislider.min.css" rel="stylesheet">
+
+<style>
+  /* Tùy chỉnh CSS cho noUiSlider */
+  .filter-section {
+    margin-bottom: 20px;
+  }
+
+  #slider-range {
+    margin: 20px 0;
+  }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .caption {
+    color: #333;
+  }
+
+  /* Tùy chỉnh giao diện noUiSlider */
+  .noUi-horizontal {
+  height: 6px;
+  background: #ddd;
+  border-radius: 5px;
+}
+
+ .noUi-connect {
+    background-color: #000000;
+  }
+
+.noUi-horizontal .noUi-handle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #000000;
+  top: -5px;
+  cursor: pointer;
+  box-shadow: none
+}
+  .noUi-handle::before,
+.noUi-handle::after {
+  content: none;
+}
+</style>
+
+<div class="product-container">
+  <div class="layout">
+    <aside class="sidebar">
+      <h3>Bộ lọc</h3>
+      <form method="GET" action="{% url 'product_list' %}">
+        <input type="hidden" name="category" value="{{ category }}">
+        <!-- Bộ lọc giá với noUiSlider -->
+        <div class="filter-section">
+  <h4>Mức giá</h4>
+  <div id="slider-range"></div>
+  <div class="slider-labels">
+    <div class="caption">
+      <strong>Min:</strong> <span id="slider-range-value1">{{ price_min }}</span>đ
+    </div>
+    <div class="caption text-right">
+      <strong>Max:</strong> <span id="slider-range-value2">{{ price_max }}</span>đ
+    </div>
+  </div>
+  <input type="hidden" id="price_min" name="price_min" value="{{ price_min }}">
+  <input type="hidden" id="price_max" name="price_max" value="{{ price_max }}">
+</div>
+        <!-- Bộ lọc màu sắc -->
+        <div class="filter-section">
+          <h4>Màu sắc</h4>
+          {% for color in colors %}
+            <label>
+              <input type="checkbox" name="color" value="{{ color }}" {% if color in selected_colors %}checked{% endif %}>
+              {{ color }}
+            </label>
+          {% endfor %}
+        </div>
+
+        <button type="submit">Lọc</button>
+      </form>
+    </aside>
+
+    <!-- Danh sách sản phẩm -->
+    <main class="product-list">
+      <h2>{{ category_name }}</h2>
+      <div class="product-grid">
+        {% for product in products %}
+          <div class="product-item">
+            <a href="{% url 'product_detail' product.id %}">
+              <img src="{{ product.primary_image.Image_Url }}" alt="{{ product.Product_Name }}">
+            </a>
+            <h3>
+              <a href="{% url 'product_detail' product_id=product.id %}">{{ product.Product_Name }}</a>
+            </h3>
+            <p class="price">{{ product.Unit_Price|intcomma }}đ</p>
+          </div>
+        {% empty %}
+          <p>Không có sản phẩm nào.</p>
+        {% endfor %}
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Thêm JavaScript của noUiSlider -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.0/nouislider.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  const slider = document.getElementById('slider-range');
+
+  const priceMinInput = document.getElementById('price_min');
+  const priceMaxInput = document.getElementById('price_max');
+
+  noUiSlider.create(slider, {
+    start: [parseInt(priceMinInput.value, 10) || 0, parseInt(priceMaxInput.value, 10) || 200000], // Giá trị từ backend
+    connect: true,
+    range: {
+      min: 0,
+      max: 200000,
+    },
+    step: 10000,
+    format: {
+      to: (value) => Math.round(value).toLocaleString(),
+      from: (value) => Number(value.replace(/,/g, ''))
+    },
+  });
+
+  const minValueElement = document.getElementById('slider-range-value1');
+  const maxValueElement = document.getElementById('slider-range-value2');
+
+  slider.noUiSlider.on('update', (values) => {
+    minValueElement.textContent = values[0];
+    maxValueElement.textContent = values[1];
+    priceMinInput.value = values[0].replace(/,/g, '');
+    priceMaxInput.value = values[1].replace(/,/g, '');
+  });
+});
+</script>
+
+{% endblock %}

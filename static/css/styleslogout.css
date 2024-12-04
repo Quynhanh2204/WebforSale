@@ -1,0 +1,80 @@
+/* Đặt nền màu tổng thể cho trang */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9; /* Màu nền nhạt */
+}
+
+/* Định dạng cho phần header và navbar */
+header {
+    background-color: #f1c40f; /* Màu vàng đồng bộ với footer */
+    padding: 10px;
+    text-align: center;
+    color: #2c3e50; /* Màu chữ */
+}
+
+/* Định dạng phần chính */
+.main-content {
+    padding: 50px;
+    text-align: center;
+}
+
+.main-content h1 {
+    color: #2c3e50; /* Màu chữ chính */
+    font-size: 2em;
+}
+
+.main-content p {
+    margin-top: 10px;
+    color: #34495e; /* Màu chữ phụ */
+}
+
+/* Định dạng phần footer */
+footer {
+    background-color: #f1c40f; /* Màu vàng */
+    color: #2c3e50;
+    padding: 20px;
+    text-align: center;
+    position: fixed; /* Giữ footer cố định ở cuối trang */
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 1; /* Đảm bảo footer nằm trên các phần tử khác */
+}
+
+footer a {
+    color: #2c3e50; /* Màu chữ liên kết */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Các phần khác như icon và thông tin liên hệ */
+footer .social-icons {
+    margin-top: 10px;
+}
+
+.social-icons img {
+    width: 24px;
+    height: 24px;
+    margin: 0 5px;
+}
+
+/* Đảm bảo footer luôn ở dưới cùng */
+html, body {
+    height: 100%;
+}
+
+.container {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+}
